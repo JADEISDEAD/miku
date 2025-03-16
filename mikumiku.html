@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>miku miku</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -15,6 +16,8 @@
             background: url('https://raw.githubusercontent.com/JADEISDEAD/MikuMikuBeam/refs/heads/main/public/miku.gif') no-repeat center center fixed;
             background-size: cover;
             position: relative;
+            font-family: 'Poppins', sans-serif;
+            color: white;
         }
 
         #click-button {
@@ -27,22 +30,38 @@
             border-radius: 10px;
             position: relative;
             top: 100px;
+            transition: transform 0.3s ease;
         }
 
         #click-button:hover {
             background-color: #ffc0cb;
+            transform: scale(1.1);
         }
 
-        #stopwatch {
+        #countdown {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 100px;
+            color: black;
+            font-weight: bold;
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.7);
             display: none;
+            opacity: 1;
+            animation: flash 1s infinite;
+        }
+
+        @keyframes flash {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
         }
 
         #ip-address {
@@ -50,29 +69,19 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 32px;
-            color: pink;
+            font-size: 100px;
+            color: black;
             font-family: 'Courier New', monospace;
             white-space: nowrap;
             display: none;
-            animation: roll 10s linear infinite;
+            animation: flash 1s infinite;
             font-weight: normal;
         }
 
-        @keyframes roll {
-            0% {
-                transform: translate(-50%, -50%) translateX(100%);
-            }
-            100% {
-                transform: translate(-50%, -50%) translateX(-100%);
-            }
-        }
-
-        /* New style for black and bolded IP text */
         .ip-changed {
-            color: black;
             font-weight: bold;
-            font-size: 48px; /* Large font size */
+            background-color: #ffb6c1;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
@@ -80,35 +89,35 @@
 
     <button id="click-button">Click Me</button>
     <audio id="song" src="https://raw.githubusercontent.com/JADEISDEAD/MikuMikuBeam/refs/heads/main/public/audio.mp3"></audio>
-    
-    <div id="stopwatch">0:00</div>
+
+    <div id="countdown"></div>
     <div id="ip-address"></div>
 
     <script>
-        let stopwatchInterval;
-        let seconds = 0;
-        let isStopwatchRunning = false;
+        let countdownInterval;
 
         document.getElementById("click-button").addEventListener("click", function() {
-            // Play the song
             var song = document.getElementById("song");
             song.play().catch(function(error) {
                 console.error("Error playing audio:", error);
             });
 
-            // Start the stopwatch
-            if (!isStopwatchRunning) {
-                document.getElementById("stopwatch").style.display = 'block'; // Show the stopwatch
-                isStopwatchRunning = true;
-                stopwatchInterval = setInterval(function() {
-                    seconds++;
-                    let minutes = Math.floor(seconds / 60);
-                    let remainingSeconds = seconds % 60;
-                    document.getElementById("stopwatch").textContent = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-                }, 1000);
-            }
+            const countdownElement = document.getElementById("countdown");
+            countdownElement.style.display = 'block';
 
-            // After 10 seconds, fetch the user's IP address and show it
+            let timeLeft = 10;
+            countdownElement.textContent = timeLeft;
+
+            countdownInterval = setInterval(function() {
+                timeLeft--;
+                countdownElement.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.style.display = 'none';
+                }
+            }, 1000);
+
             setTimeout(function() {
                 fetch('https://api.ipify.org?format=json')
                     .then(response => response.json())
@@ -116,25 +125,21 @@
                         const ipAddress = data.ip;
                         const ipElement = document.getElementById("ip-address");
                         ipElement.textContent = `Your IP: ${ipAddress}`;
-                        ipElement.style.display = 'block'; // Show the IP address
+                        ipElement.style.display = 'block';
                     })
                     .catch(error => {
                         console.error('Error fetching IP:', error);
                     });
-            }, 10000); // Wait for 10 seconds
+            }, 10000);
 
-            // After 22 seconds, change the IP address text to black and bolded, then refresh the page
             setTimeout(function() {
                 const ipElement = document.getElementById("ip-address");
-                ipElement.classList.add('ip-changed'); // Change the IP address style
-
-                // Delay before refresh to ensure the style has time to change
+                ipElement.classList.add('ip-changed');
                 setTimeout(function() {
-                    location.reload(); // Refresh the page
-                }, 500); // Short delay before refreshing
-            }, 22000); // Wait for 22 seconds
+                    location.reload();
+                }, 500);
+            }, 22000);
         });
-
     </script>
 
 </body>
