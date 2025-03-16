@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>miku miku</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('https://raw.githubusercontent.com/JADEISDEAD/MikuMikuBeam/refs/heads/main/public/miku.gif') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+        }
+
+        #click-button {
+            font-size: 24px;
+            padding: 15px 30px;
+            border: none;
+            cursor: pointer;
+            background-color: #ffb6c1;
+            color: black;
+            border-radius: 10px;
+            position: relative;
+            top: 100px;
+        }
+
+        #click-button:hover {
+            background-color: #ffc0cb;
+        }
+
+        #stopwatch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        #ip-address {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            color: pink;
+            font-family: 'Courier New', monospace;
+            white-space: nowrap;
+            display: none;
+            animation: roll 10s linear infinite;
+            font-weight: normal;
+        }
+
+        @keyframes roll {
+            0% {
+                transform: translate(-50%, -50%) translateX(100%);
+            }
+            100% {
+                transform: translate(-50%, -50%) translateX(-100%);
+            }
+        }
+
+        /* New style for black and bolded IP text */
+        .ip-changed {
+            color: black;
+            font-weight: bold;
+            font-size: 48px; /* Large font size */
+        }
+    </style>
+</head>
+<body>
+
+    <button id="click-button">Click Me</button>
+    <audio id="song" src="https://raw.githubusercontent.com/JADEISDEAD/MikuMikuBeam/refs/heads/main/public/audio.mp3"></audio>
+    
+    <div id="stopwatch">0:00</div>
+    <div id="ip-address"></div>
+
+    <script>
+        let stopwatchInterval;
+        let seconds = 0;
+        let isStopwatchRunning = false;
+
+        document.getElementById("click-button").addEventListener("click", function() {
+            // Play the song
+            var song = document.getElementById("song");
+            song.play().catch(function(error) {
+                console.error("Error playing audio:", error);
+            });
+
+            // Start the stopwatch
+            if (!isStopwatchRunning) {
+                document.getElementById("stopwatch").style.display = 'block'; // Show the stopwatch
+                isStopwatchRunning = true;
+                stopwatchInterval = setInterval(function() {
+                    seconds++;
+                    let minutes = Math.floor(seconds / 60);
+                    let remainingSeconds = seconds % 60;
+                    document.getElementById("stopwatch").textContent = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+                }, 1000);
+            }
+
+            // After 10 seconds, fetch the user's IP address and show it
+            setTimeout(function() {
+                fetch('https://api.ipify.org?format=json')
+                    .then(response => response.json())
+                    .then(data => {
+                        const ipAddress = data.ip;
+                        const ipElement = document.getElementById("ip-address");
+                        ipElement.textContent = `Your IP: ${ipAddress}`;
+                        ipElement.style.display = 'block'; // Show the IP address
+                    })
+                    .catch(error => {
+                        console.error('Error fetching IP:', error);
+                    });
+            }, 10000); // Wait for 10 seconds
+
+            // After 22 seconds, change the IP address text to black and bolded, then refresh the page
+            setTimeout(function() {
+                const ipElement = document.getElementById("ip-address");
+                ipElement.classList.add('ip-changed'); // Change the IP address style
+
+                // Delay before refresh to ensure the style has time to change
+                setTimeout(function() {
+                    location.reload(); // Refresh the page
+                }, 500); // Short delay before refreshing
+            }, 22000); // Wait for 22 seconds
+        });
+
+    </script>
+
+</body>
+</html>
