@@ -83,9 +83,27 @@
             background-color: #ffb6c1;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
+          .custom-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        .custom-button img {
+            width: 40px;
+            height: 40px;
+        }
+        .custom-button img:hover {
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
+    <a href="http://jadeisdead.com/" target="_blank" class="custom-button">
+        <img src="https://media.tenor.com/yso9Ncqwm5UAAAAi/click-subscribe.gif" alt="Custom Button">
+    </a>
 
     <button id="click-button">Click Me</button>
     <audio id="song" src="https://raw.githubusercontent.com/JADEISDEAD/MikuMikuBeam/refs/heads/main/public/audio.mp3"></audio>
